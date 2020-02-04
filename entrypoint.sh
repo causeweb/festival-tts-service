@@ -15,9 +15,7 @@ set -e
 
 cd /opt/festival
 
-text2wave -mode singing utterances/doremi.xml -o synthesized/doremi.wav -eval "(voice_rab_diphone)"
-
-cp synthesized/doremi.wav /opt/out/
+text2wave -mode singing utterances/daisy.xml -o synthesized/daisy.wav
 
 # debug: keep alive
 while true; do sleep 1000; done
