@@ -10,6 +10,6 @@ docker build -t tts .  && docker run -v `pwd`/synthesized:/opt/festival/synthesi
 ## Provide your own text
 run docker container with your text as argument:
 ```
-docker run -it -v `pwd``/synthesized:/opt/festival/synthesized tts "Hello. This is text to speech service"
+curl -X POST --data-binary @out.xml http://localhost:3000
 ```
-Resulting audio file location: 'synthesized/tts.wav'.
+Resulting audio file location: 'synthesized/tmp.wav'.
