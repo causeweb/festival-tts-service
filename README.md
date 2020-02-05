@@ -1,5 +1,11 @@
-## Description
-Based on the Festival project (https://github.com/festvox/festival/).
+# Festival TTS Service
+
+<!-- badges: start -->
+[![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![License: MIT](https://img.shields.io/github/license/rpc5102/festival-tts-service.svg?style=flat)](https://opensource.org/licenses/MIT)
+<!-- badges: end -->
+
+Based on the [Festival TTS](https://github.com/festvox/festival/) project and [heyMP/r-service](https://github.com/heyMP/r-service/).
 
 ## Usage
 In the command line run following commands
