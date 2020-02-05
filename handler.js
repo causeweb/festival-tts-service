@@ -32,7 +32,9 @@ class Routing {
   }
 
   async handle(req, res) {
-    if (req.body && typeof req.body === 'string') {
+    if (req.method === 'GET') {
+      console.log(req.query);
+    } else if (req.method === 'POST' && req.body && typeof req.body === 'string') {
       let request = req.body; // Ingnore for now.
 
       fs.writeFileSync('./utterances/tmp.xml', req.body, 'utf8');
