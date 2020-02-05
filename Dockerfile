@@ -26,6 +26,15 @@ WORKDIR /opt/festival
 
 RUN curl -o utterances/daisy.xml https://raw.githubusercontent.com/festvox/festival/master/examples/songs/daisy.xml
 
-COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/bin/bash", "-c", "/entrypoint.sh ${*}", "--"]
+# COPY entrypoint.sh /entrypoint.sh
+# ENTRYPOINT ["/bin/bash", "-c", "/entrypoint.sh ${*}", "--"]
 
+# Install Node
+RUN curl -sL https://rpm.nodesource.com/setup_13.x | bash -
+RUN yum install -y nodejs
+COPY package.json package-lock*.json ./
+RUN npm install
+COPY . .
+
+EXPOSE 3000
+CMD ["node", "index.js"]

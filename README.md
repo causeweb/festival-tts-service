@@ -4,8 +4,7 @@ Based on the Festival project (https://github.com/festvox/festival/).
 ## Usage
 In the command line run following commands
 ```
-docker build -t tts .
-docker run -i -v `pwd`/synthesized:/opt/festival/synthesized --rm tts
+docker build -t tts .  && docker run -v `pwd`/synthesized:/opt/festival/synthesized -p 3000:3000 --rm tts
 ```
 
 ## Provide your own text

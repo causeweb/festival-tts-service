@@ -1,0 +1,9 @@
+version: '2'
+services:
+  festival-service:
+    build: .
+    ports:
+      - '3000:3000'
+    command: 'node index.js'
+    volumes:
+      - './synthesized:/opt/festival/synthesized'
