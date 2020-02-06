@@ -5,9 +5,11 @@
 *   Sharp - # - %23
 *  
 *  Sample Request [GET]:
-*   ?bpm=130&beats=1.0&notes=A4&utterance=test
+*   /generate/wav?bpm=130&beats=1.0&notes=A4&utterance=test
 *  Result:
 *   ./utterances/130_1.0_A4_test.xml
+*  Params:
+*   (wav) | xml
 *
 *  Sample Request [POST]:
 *   curl -X POST --data-binary @130_1.0_A4_test.xml http://localhost:3000/
@@ -21,85 +23,126 @@ const cors = require('cors');
 const cp = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const wordpos = require('wordpos');
 
 module.exports = async (config) => {
   const routing = new Routing(config.app);
   routing.configure();
-  routing.bind(routing.handle);
+  routing.bind(routing.handler);
+}
+
+function generateXML(params) {
+  const bpm = params.bpm ? params.bpm : "130";
+  const beats = params.beats ? params.beats : "1.0";
+  const notes = params.notes ? params.notes : "A4";
+  const utterance = params.utterance ? params.utterance : "None";
+
+  const dir = './utterances/';
+
+  const filename = [bpm, beats, notes, utterance].join("_") + '.xml';
+  const output = path.join(dir, filename);
+
+  let template = 
+`<?xml version="1.0"?>
+<!DOCTYPE SINGING PUBLIC "-//SINGING//DTD SINGING mark up//EN" "Singing.v0_1.dtd"[]>
+<SINGING BPM="${ bpm }">
+<DURATION BEATS="${ beats }">
+  <PITCH NOTE="${ notes }">${ utterance }</PITCH>
+</DURATION>
+</SINGING>`;
+
+  writeFile(dir, filename, template);
+
+  return(path.resolve(output));
+}
+
+/* expects path to xml template file */
+function generateWAV(template) {
+  const dir = './synthesized/';
+
+  let file = path.basename(template);
+
+  if(file) {
+    // We want the output file to have the same name but new extension
+    let output = path.resolve(path.join(dir, path.parse(file).name + '.wav'));
+    let command = 'text2wave -mode singing ' + template + ' -o ' + output;
+
+    console.log(command);
+
+    try {
+      let result = cp.execSync(command).toString();
+    } catch (e) {
+      // 127 => command not found; text2wave not installed.
+    }
+  } else {
+    res.sendStatus(400);
+  }
+}
+
+function writeFile(directory, filename, content) {
+  if(!fs.existsSync(directory)) {
+    fs.mkdirSync(directory);
+  } 
+
+  try {
+    fs.writeFileSync(filename, content, { encoding:'utf8', flag:'w' });
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(500);
+  }
 }
 
 class Routing {
   constructor(app) {
     this.app = app;
-  }
+  } 
 
   configure() {
-    const bodyParser = require('body-parser')
-    this.app.use(cors())
+    const bodyParser = require('body-parser');
+    this.app.use(cors());
     this.app.use(bodyParser.text({
       type: "*/*"
     }));
     this.app.disable('x-powered-by');
   }
 
-  bind(route) {
-    this.app.post('/*', route);
-    this.app.get('/*', route);
-    this.app.patch('/*', route);
-    this.app.put('/*', route);
-    this.app.delete('/*', route);
+  bind(handler) {
+    //this.app.post('/*', handle);
+    this.app.get('/generate/*', handler);
+    this.app.get('/lookup/*', handler);
   }
 
-  async handle(req, res) {
-    if (req.method === 'GET' && Object.keys(req.query).length !== 0) {
-      console.log(req.query);
+  async handler(req, res) {
+    console.log(req.route.path);
+    console.log(req.params);
+    const querying = Object.keys(req.query).length !== 0;
 
-      const bpm = req.query.bpm ? req.query.bpm : "130";
-      const beats = req.query.beats ? req.query.beats : "1.0";
-      const notes = req.query.notes ? req.query.notes : "A4";
-      const utterance = req.query.utterance ? req.query.utterance : "None";
+    if (req.method === 'GET') {
+      if(req.route.path == "/generate/*" && querying) {
 
-      const dir = './utterances/';
+        let template = generateXML(req.query);
 
-      const filename = [bpm, beats, notes, utterance].join("_") + '.xml';
-      const output = path.join(dir, filename);
+        if(template.length > 0 && req.params[0] != 'xml'){
+          let wav = generateWAV(template);
+        }
 
-      let template = 
-`<?xml version="1.0"?>
-<!DOCTYPE SINGING PUBLIC "-//SINGING//DTD SINGING mark up//EN" "Singing.v0_1.dtd"[]>
-<SINGING BPM="${ bpm }">
-  <DURATION BEATS="${ beats }">
-    <PITCH NOTE="${ notes }">${ utterance }</PITCH>
-  </DURATION>
-</SINGING>`;
-
-      if(!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-      } 
-
-      try {
-        fs.writeFileSync(output, template, { encoding:'utf8', flag:'w' });
-      } catch (e) {
-        console.error(e);
-        res.sendStatus(500);
+        res.sendFile(template);
+      } else if (req.route.path == "/lookup/*" && querying) {
+        const wordnet = new wordpos();
+        
+        if(req.params[0] == 'word') {
+          wordnet.lookup(req.query.terms, (result) => {
+            res.json(result);
+          });  
+        }
+       
+      } else {
+        res.sendStatus(400);
       }
-
-      res.sendFile(path.resolve(output));
     } else if (req.method === 'POST' && req.body && typeof req.body === 'string') {
-      const request = req.body;
-      const dir = './synthesized/';
-
-      fs.writeFileSync('./utterances/tmp.xml', request, { encoding:'utf8', flag:'w' });
-
-      let result = cp.execSync('text2wave -mode singing ./utterances/tmp.xml -o ./synthesized/tmp.wav').toString();
-
-      result = result.replace(/^,/g, '')
-      result = result.replace(/\n,$/g, '')
-      result = result.trim()
-
-      res.send(result);
+      res.sendStatus(400);
     } else {
-      res.sendStatus(400)
+      res.sendStatus(400);
     }
   }
 }
