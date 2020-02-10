@@ -9,8 +9,7 @@ const wordpos = require('wordpos');
 const Filter = require('bad-words'),
       filter = new Filter();
 
-const dictionary_en_us = path.parse(require.resolve('dictionary-en-us'));
-console.log(dictionary_en_us);
+const dictionary_en_us = path.dirname(require.resolve('dictionary-en-us'));
 
 const Nodehun = require('nodehun');
 
