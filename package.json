@@ -14,10 +14,12 @@
   "dependencies": {
     "bad-words": "^3.0.3",
     "body-parser": "^1.19.0",
+    "cmudict": "^1.0.2",
     "cors": "^2.8.5",
     "dictionary-en-us": "^2.2.1",
     "express": "^4.17.1",
     "nodehun": "^3.0.1",
+    "syllable": "^4.0.1",
     "wordpos": "^2.0.0"
   },
   "devDependencies": {
