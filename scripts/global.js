@@ -39,8 +39,8 @@ document.addEventListener('DOMContentLoaded', function(){
         */
         $("[name='" + element + "_feedback']").addClass('checking');
         showFeedback(element, '<span class="hint" style="display:inline;">Checking input </span><i class="fa fa-spinner fa-spin" aria-hidden="true"></i>');
-        $.getJSON("/scripts/syllable_count.py?word=" + answered).done(function (response) {
-            return response;
+        $.getJSON("/smiles/api/lookup/word?terms=" + answered).done(function (response) {
+            return response.syllables;
         });
     }
 
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function(){
     window.lookup_word = function lookup_word(actions, terms) {
         return $.ajax({
             dataType: "json",
-            url: "/smiles/wordnet.php?action=" + actions + "&terms=" + terms,
+            url: "/smiles/api/lookup/word?terms=" + terms,
             async: false,
             success: function (data) {
                 return data;

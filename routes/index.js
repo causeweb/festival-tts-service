@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-router.use('/api', require('./api'));
+const base = '/smiles';
 
-router.get('/api', (req, res) => {
+router.use(base + '/api', require('./api'));
+
+router.get(base + '/api', (req, res) => {
     res.send('Api route');
 });
 

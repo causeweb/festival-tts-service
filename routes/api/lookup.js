@@ -18,7 +18,9 @@ const Filter = require('bad-words'),
 
 const syllable = require('syllable');
 
-/* * Useful for checking pronunciations * *
+/***
+  * Extra
+  * Check pronunciations:
     const CMUDict = require('cmudict').CMUDict,
     cmudict = new CMUDict();
     pronunciation = cmudict.get('example');
@@ -44,7 +46,7 @@ router.get('/*', (req, res) => {
 
       Promise.all(results).then(results => {
         for (const key in results) {
-          let word = results[key];
+          let word = results[key],
               wordid = results[key][0],
               foul = results[key][1],
               syllables = results[key][2];
