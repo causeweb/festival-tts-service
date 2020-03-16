@@ -9,7 +9,7 @@ Based on the [Festival TTS](https://github.com/festvox/festival/) project and [h
 ## Usage
 In the command line run following commands
 ```
-docker build -t tts .  && docker run -v `pwd`/synthesized:/opt/festival/synthesized -p 3000:3000 --rm tts
+docker build -t tts . && docker run -v `pwd`/synthesized:/opt/festival/synthesized -p 3000:3000 --rm tts
 ```
 
 ## Provide your own text

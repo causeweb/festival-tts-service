@@ -19,6 +19,7 @@
     "dictionary-en-us": "^2.2.1",
     "express": "^4.17.1",
     "nodehun": "^3.0.1",
+    "node-gyp": "^6.1.0",
     "syllable": "^4.0.1",
     "wordpos": "^2.0.0"
   },

@@ -30,8 +30,14 @@ RUN curl -o utterances/daisy.xml https://raw.githubusercontent.com/festvox/festi
 # ENTRYPOINT ["/bin/bash", "-c", "/entrypoint.sh ${*}", "--"]
 
 # Install Node
-RUN curl -sL https://rpm.nodesource.com/setup_13.x | bash -
-RUN yum install -y nodejs
+RUN curl -sL https://rpm.nodesource.com/setup_12.x | bash - && \
+    yum install -y nodejs && \
+    echo "Node Version: " && node -v && echo "NPM Version: " && npm -v && \
+    yum install centos-release-scl scl-utils -y && \
+    yum install devtoolset-6 -y && \
+    yum update -y && \
+    source scl_source enable devtoolset-6 && \
+    gcc -v && gcc-c++ -v
 COPY package.json package-lock*.json ./
 RUN npm install
 COPY . .
