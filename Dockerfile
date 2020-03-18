@@ -2,9 +2,9 @@ FROM centos:7
 
 ENV USER root
 
-RUN yum install festival -y
-
-RUN cd /usr/share \
+# Install Festival
+RUN yum install festival -y \
+    && cd /usr/share \
     && curl -o festlex_CMU.tar.gz http://festvox.org/packed/festival/2.4/festlex_CMU.tar.gz \
     && tar -xvf festlex_CMU.tar.gz \
     && rm festlex_CMU.tar.gz \
@@ -30,16 +30,18 @@ RUN curl -o utterances/daisy.xml https://raw.githubusercontent.com/festvox/festi
 # ENTRYPOINT ["/bin/bash", "-c", "/entrypoint.sh ${*}", "--"]
 
 # Install Node
-RUN curl -sL https://rpm.nodesource.com/setup_12.x | bash - && \
-    yum install -y nodejs && \
-    echo "Node Version: " && node -v && echo "NPM Version: " && npm -v && \
-    yum install centos-release-scl scl-utils -y && \
-    yum install devtoolset-6 -y && \
-    yum update -y && \
-    source scl_source enable devtoolset-6 && \
-    gcc -v && gcc-c++ -v
+RUN curl -sL https://rpm.nodesource.com/setup_12.x | bash - \
+    && yum install -y nodejs \
+    && echo "Node Version: " && node -v && echo "NPM Version: " && npm -v
+
 COPY package.json package-lock*.json ./
-RUN npm install
+
+# Install build tools for npm deps
+RUN yum install centos-release-scl scl-utils -y \
+    && yum install devtoolset-6-make devtoolset-6-gcc devtoolset-6-gcc-c++ -y \
+    && source scl_source enable devtoolset-6 \
+    && npm install
+
 COPY . .
 
 EXPOSE 3000

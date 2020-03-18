@@ -1,22 +1,3 @@
-/* * *
-*  Music note symbols:
-*   Flat - ♭ - &#9837
-*   Natural - ♮ - &#9838
-*   Sharp - # - %23
-*  
-*  Sample Request [GET]:
-*   /generate/wav?bpm=130&beats=1.0&notes=A4&utterance=test
-*  Result:
-*   ./utterances/130_1.0_A4_test.xml
-*  Params:
-*   (wav) | xml
-*
-*  Sample Request [POST]:
-*   curl -X POST --data-binary @130_1.0_A4_test.xml http://localhost:3000/
-*  Result:
-*   ./synthesized/130_1.0_A4_test.wav
-*/
-
 "use strict"
 
 const cors = require('cors');
@@ -30,16 +11,17 @@ module.exports = async (config) => {
 class Routing {
   constructor(app) {
     this.app = app;
-  } 
+  }
 
   configure() {
     const bodyParser = require('body-parser');
 
-    this.app.use(cors());
-
-    this.app.use(bodyParser.text({
-      type: "*/*"
-    }));
+    this.app.use(
+      cors(),
+      bodyParser.text({
+        type: "*/*"
+      })
+    );
 
     this.app.disable('x-powered-by');
   }
@@ -68,13 +50,13 @@ class Routing {
         res.sendFile(template);
       } else if (req.route.path == "/lookup/*" && querying) {
         const wordnet = new wordpos();
-        
+
         if(req.params[0] == 'word') {
           wordnet.lookup(req.query.terms, (result) => {
             res.json(result);
-          });  
+          });
         }
-       
+
       } else {
         res.sendStatus(400);
       }
